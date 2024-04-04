@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Ribeye+Marrow&family=Tapestry&family=Whisper&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Tic Tac Toe</h1>
+    <p class="prg">Note:<br>By default,<br> the game initializes in a <br>player-versus-player mode.</p>
+    <div class="container">
+        <div class="row">
+            <span class="box" data-index="0"></span>
+            <span class="box" data-index="1"></span>
+            <span class="box" data-index="2"></span>
+        </div>
+        <div class="row">
+            <span class="box" data-index="3"></span>
+            <span class="box" data-index="4"></span>
+            <span class="box" data-index="5"></span>
+        </div>
+        <div class="row">
+            <span class="box" data-index="6"></span>
+            <span class="box" data-index="7"></span>
+            <span class="box" data-index="8"></span>
+        </div>
+    </div>
+    <button class="play" onclick="playGame()">Click To Play vs Computer </button>
+    <button class="play1" onclick="resetGame()">Reset Game</button>
+    <div>
+        <p class="parag">The Result is: <span class="wins" id="wins"></span></p>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        let cells = Array.from(document.querySelectorAll('.box'));
+        let gameWon = false;
+        let isComputerGame = false;
+        let winningCombos = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
+
+        function handleClick(event) {
+            if (!gameWon) {
+                let index = event.target.dataset.index;
+                if (!cells[index].textContent) {
+                    cells[index].textContent = currentPlayer;
+                    if (checkWinner()) {
+                       document.getElementById('wins').innerHTML= (`Player ${currentPlayer} wins!`);
+                        gameWon = true;
+                    } else if (cells.every(cell => cell.textContent)) {
+                        document.getElementById('wins').innerHTML=("It's a tie!");
+                    } else {
+                        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                        if (isComputerGame && currentPlayer === 'O') {
+                            setTimeout(computerMove, 1000); // Wait 1 second before computer moves
+                        }
+                    }
+                }
+            }
+        }
+
+        function checkWinner() {
+            return winningCombos.some(combo => {
+                return combo.every(index => cells[index].textContent === currentPlayer);
+            });
+        }
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleClick);
+        });
+
+        function computerMove() {
+            let emptyCells = cells.filter(cell => !cell.textContent);
+            if (emptyCells.length > 0) {
+                let randomIndex = Math.floor(Math.random() * emptyCells.length);
+                let cell = emptyCells[randomIndex];
+                cell.textContent = currentPlayer;
+                if (checkWinner()) {
+                    document.getElementById('wins').innerHTML=(`Player ${currentPlayer} wins!`);
+                    gameWon = true;
+                } else if (cells.every(cell => cell.textContent)) {
+                    document.getElementById('wins').innerHTML=("It's a tie!");
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
+            }
+        }
+
+        function playGame() {
+            isComputerGame = true;
+            currentPlayer = 'X';
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+            gameWon = false;
+            document.getElementById('wins').innerHTML = ''; // Clear the result
+            alert("You are playing against the computer. Click on a box to make your move.");
+        }
+
+        function resetGame() {
+            isComputerGame = false;
+            currentPlayer = 'X';
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+            gameWon = false;
+            document.getElementById('wins').innerHTML = ''; // Clear the result
+        }
+    </script>
+</body>
+</html>
